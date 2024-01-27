@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
@@ -14,7 +13,6 @@ class NotificationHelper {
   static const _channelId = "1";
   static const _channelName = "channel_1";
   static const _channelDesc = "restaurants apps channel";
-  final _random = Random();
   static NotificationHelper? _instance;
 
   NotificationHelper._internal() {
@@ -49,7 +47,7 @@ class NotificationHelper {
 
   Future<void> showNotification(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
-    ListRestaurant result,
+    Restaurant restaurant,
   ) async {
     var vibrationPattern = Int64List(4);
     vibrationPattern[0] = 0;
@@ -77,10 +75,8 @@ class NotificationHelper {
     );
 
     var titleNotification =
-        "<b>Here We Go! this restaurant are available on your apps</b>";
-    var data = result.restaurants;
-    var index = _random.nextInt(data.length);
-    var titleRestaurant = result.restaurants[index].name;
+        "<b>Here We Go! this restaurant is available on your app</b>";
+    var titleRestaurant = restaurant.name;
 
     await flutterLocalNotificationsPlugin.show(
       0,
@@ -88,7 +84,7 @@ class NotificationHelper {
       titleRestaurant,
       platformChannelSpecifics,
       payload: json.encode(
-        data[index].toJson(),
+        restaurant.toJson(),
       ),
     );
   }

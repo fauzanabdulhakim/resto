@@ -1,4 +1,5 @@
 import 'dart:isolate';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -13,8 +14,6 @@ class BackgroundService {
   static BackgroundService? _instance;
   static const String _isolateName = 'isolate';
   static SendPort? _uiSendPort;
-
-  final RestaurantProvider _restaurantProvider = RestaurantProvider();
 
   BackgroundService._internal() {
     _instance = this;
@@ -33,10 +32,21 @@ class BackgroundService {
     debugPrint('Alarm fired!');
 
     final NotificationHelper notificationHelper = NotificationHelper();
-    await notificationHelper.showNotification(
-      flutterLocalNotificationsPlugin,
-      _instance!._restaurantProvider.restaurants as ListRestaurant,
-    );
+
+    final RestaurantProvider _restaurantProvider = RestaurantProvider();
+    await _restaurantProvider.fetchRestaurants(); 
+
+    final List<Restaurant> restaurants = _restaurantProvider.restaurants;
+
+    if (restaurants.isNotEmpty) {
+      final int index = Random().nextInt(restaurants.length);
+      final Restaurant randomRestaurant = restaurants[index];
+
+      await notificationHelper.showNotification(
+        flutterLocalNotificationsPlugin,
+        randomRestaurant,
+      );
+    }
 
     _uiSendPort ??= IsolateNameServer.lookupPortByName(_isolateName);
     _uiSendPort?.send(null);

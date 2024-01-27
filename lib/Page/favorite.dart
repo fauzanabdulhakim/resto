@@ -51,60 +51,69 @@ class _FavoritePageState extends State<FavoritePage> {
                     child: CircularProgressIndicator(),
                   );
                 } else {
-                  return ListView.builder(
-                    itemCount: favoriteProvider.favoriteRestaurants.length,
-                    itemBuilder: (context, index) {
-                      Restaurant restaurant =
-                          favoriteProvider.favoriteRestaurants[index];
-                      return ListTile(
-                        title: Text(restaurant.name),
-                        subtitle: Row(
-                          children: [
-                            Icon(Icons.star,
-                                size: 16, color: Colors.yellow[800]),
-                            SizedBox(width: 4),
-                            Text(restaurant.rating.toString()),
-                          ],
-                        ),
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: Image.network(
-                            'https://restaurant-api.dicoding.dev/images/medium/${restaurant.pictureId}',
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
+                  return favoriteProvider.favoriteRestaurants.isEmpty
+                      ? Center(
+                          child: Text(
+                            'Belum ada restaurant favorite yang ditampilkan',
+                            textAlign: TextAlign.center,
                           ),
-                        ),
-                        onTap: () async {
-                          Provider.of<RestaurantDetailProvider>(context,
-                                  listen: false)
-                              .resetState();
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RestaurantDetailPage(
-                                restaurant.id,
-                                restaurant.name,
+                        )
+                      : ListView.builder(
+                          itemCount:
+                              favoriteProvider.favoriteRestaurants.length,
+                          itemBuilder: (context, index) {
+                            Restaurant restaurant =
+                                favoriteProvider.favoriteRestaurants[index];
+                            return ListTile(
+                              title: Text(restaurant.name),
+                              subtitle: Row(
+                                children: [
+                                  Icon(Icons.star,
+                                      size: 16, color: Colors.yellow[800]),
+                                  SizedBox(width: 4),
+                                  Text(restaurant.rating.toString()),
+                                ],
                               ),
-                            ),
-                          );
-                          Provider.of<FavoriteProvider>(context, listen: false)
-                              .fetchFavoriteRestaurants();
-                        },
-                        trailing: IconButton(
-                          icon: Icon(
-                            Icons.delete,
-                            color: Colors.grey,
-                          ),
-                          onPressed: () {
-                            Provider.of<FavoriteProvider>(context,
-                                    listen: false)
-                                .removeFavoriteRestaurant(restaurant);
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: Image.network(
+                                  'https://restaurant-api.dicoding.dev/images/medium/${restaurant.pictureId}',
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              onTap: () async {
+                                Provider.of<RestaurantDetailProvider>(context,
+                                        listen: false)
+                                    .resetState();
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => RestaurantDetailPage(
+                                      restaurant.id,
+                                      restaurant.name,
+                                    ),
+                                  ),
+                                );
+                                Provider.of<FavoriteProvider>(context,
+                                        listen: false)
+                                    .fetchFavoriteRestaurants();
+                              },
+                              trailing: IconButton(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () {
+                                  Provider.of<FavoriteProvider>(context,
+                                          listen: false)
+                                      .removeFavoriteRestaurant(restaurant);
+                                },
+                              ),
+                            );
                           },
-                        ),
-                      );
-                    },
-                  );
+                        );
                 }
               },
             );
